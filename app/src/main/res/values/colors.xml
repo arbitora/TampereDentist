@@ -3,4 +3,10 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="List.Item.Selected">#b1b1b1</color>
+    <color name="List.Item.NotSelected">#efefef</color>
+
+    <color name="Text.Clickable">#00719e</color>
+
 </resources>
