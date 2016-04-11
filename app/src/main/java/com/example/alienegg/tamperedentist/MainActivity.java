@@ -1,38 +1,63 @@
 package com.example.alienegg.tamperedentist;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 public class MainActivity extends AppCompatActivity {
-
-    // URL = http://opendata.navici.com/tampere/opendata/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=opendata:HAMMASHOITOLAT&outputFormat=json
+    private final String LOG_TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.v(LOG_TAG, "in onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState == null)
+        {
+            getSupportFragmentManager().beginTransaction().add(R.id.container, new DentistFragment()).commit();
+        }
 
         if (savedInstanceState != null)
         {
             // TODO Get data back or vice versa.
         }
-
-        // TODO start fragment here.
-
     }
 
+
+    @Override
+    protected void onStart() {
+        Log.v(LOG_TAG, "in onStart");
+        super.onStart();
+        // The activity is about to become visible.
+    }
 
     @Override
     protected void onResume() {
+        Log.v(LOG_TAG, "in onResume");
         super.onResume();
-        // TODO On Resume
+        // The activity has become visible (it is now "resumed").
     }
 
     @Override
-    public void onDestroy ()
-    {
+    protected void onPause() {
+        Log.v(LOG_TAG, "in onPause");
+        super.onPause();
+        // Another activity is taking focus (this activity is about to be "paused").
+    }
+
+    @Override
+    protected void onStop() {
+        Log.v(LOG_TAG, "in onStop");
+        super.onStop();
+        // The activity is no longer visible (it is now "stopped")
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.v(LOG_TAG, "in onDestroy");
         super.onDestroy();
-        // TODO On Destroy.
+        // The activity is about to be destroyed.
     }
 
 }

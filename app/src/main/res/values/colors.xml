@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">#00438E</color>
+    <color name="colorPrimaryDark">#00336D</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="List.Item.Selected">#b1b1b1</color>
-    <color name="List.Item.NotSelected">#efefef</color>
+    <color name="List.Item.Corners">#00438E</color>
+    <color name="List.Item.Selected">#1483FF</color>
+    <color name="List.Item.NotSelected">#ABD3FF</color>
 
-    <color name="Text.Clickable">#00719e</color>
+    <color name="Text.URL_Color">#7BBAFF</color>
+    <color name="Text.Color">#7BBAFF</color>
+    <color name="Background">#ABD3FF</color>
+
 
 </resources>
