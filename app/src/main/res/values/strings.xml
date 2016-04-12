@@ -1,5 +1,9 @@
 <resources>
-    <string name="app_name">TampereDentist</string>
-    <string name="dentistTextView">Hospital name</string>
+    <string name="app_name">Tampere Dentists</string>
+    <string name="dentistTextView">Dentist Location name</string>
     <string name="detailDentistNameTXTview">Dentist Name</string>
+    <string name="GoogleMapsImageView">Start Map application.</string>
+    <string name="phoneImageView">Call to this phonenumber.</string>
+    <string name="browserImageView">Start browser.</string>
 </resources>
+

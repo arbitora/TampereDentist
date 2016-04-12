@@ -28,6 +28,7 @@ import java.util.List;
  */
 public class DentistFragment extends android.support.v4.app.Fragment {
 
+    // TODO Cursor and Content Provider SQL
 
     //private ArrayAdapter<DentistObj> mDentistAdapter;
     private DentistObjAdapter mDentistAdapter;
@@ -76,6 +77,7 @@ public class DentistFragment extends android.support.v4.app.Fragment {
                 intent.putExtra("PUHELIN", selectedDentist.dentistPuhelin());
                 intent.putExtra("URL", selectedDentist.dentistLinkURL());
                 startActivity(intent);
+
 
             }
         });
@@ -204,11 +206,11 @@ public class DentistFragment extends android.support.v4.app.Fragment {
                     }
                 }
             }
-                if (dentistJsonStr != null)
-                    return getDentistDataFromJSON(dentistJsonStr);
-                else
-                    return null;
-            }
+            if (dentistJsonStr != null)
+                return getDentistDataFromJSON(dentistJsonStr);
+            else
+                return null;
+        }
 
         @Override
         protected void onPostExecute(List<DentistObj> result){
