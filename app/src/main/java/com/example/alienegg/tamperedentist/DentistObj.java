@@ -56,6 +56,8 @@ public class DentistObj implements Comparable<DentistObj>{
             return false;
     }
 
+    public String dentistID(){return id; }
+
     public String dentistName()
     {
         return nimi;

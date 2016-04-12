@@ -1,8 +1,13 @@
 package com.example.alienegg.tamperedentist;
 
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,28 +15,39 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import com.example.alienegg.tamperedentist.data.DentistContract;
 
 /**
  * Created by AlienNest on 11.4.2016.
  */
-public class DentistFragment extends android.support.v4.app.Fragment {
+public class DentistFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // TODO Cursor and Content Provider SQL
+    private static final int DENTIST_LOADER = 0;
 
-    //private ArrayAdapter<DentistObj> mDentistAdapter;
-    private DentistObjAdapter mDentistAdapter;
+    // Get the columns we need.
+    private static final String[] DENTIST_COLUMNS = {
+            DentistContract.DentistEntry.TABLE_NAME + "." + DentistContract.DentistEntry._ID,
+            DentistContract.DentistEntry.COLUMN_D_id,
+            DentistContract.DentistEntry.COLUMN_name,
+            DentistContract.DentistEntry.COLUMN_address,
+            DentistContract.DentistEntry.COLUMN_zip,
+            DentistContract.DentistEntry.COLUMN_city,
+            DentistContract.DentistEntry.COLUMN_phone,
+            DentistContract.DentistEntry.COLUMN_urlLink
+    };
+
+    // These are used to find columns stated above.
+    // Change these to appropriate values, if above DENTIST_COLUMNS is changed.
+    static final int COL_D_id = 1;
+    static final int COL_name = 2;
+    static final int COL_address = 3;
+    static final int COL_zip = 4;
+    static final int COL_city = 5;
+    static final int COL_phone = 6;
+    static final int COL_urlLink = 7;
+
+    private DentistAdapter mDentistAdapter;
     private final String LOG_TAG = DentistFragment.class.getSimpleName();
 
     public DentistFragment(){}
@@ -52,8 +68,8 @@ public class DentistFragment extends android.support.v4.app.Fragment {
         // The custom Adapter will take data from a source and
         // use it to populate the ListView it's attached to.
 
-        mDentistAdapter = new DentistObjAdapter(getActivity(), new ArrayList<DentistObj>());
-
+        //mDentistAdapter = new DentistObjAdapter(getActivity(), new ArrayList<DentistObj>());
+        mDentistAdapter = new DentistAdapter(getActivity(), null, 0);
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
@@ -66,17 +82,15 @@ public class DentistFragment extends android.support.v4.app.Fragment {
                 // TODO create and open detailed dentist activity.
 
                 // Get DentistObj which is at the corresponding position and start Detail intent for it.
-                DentistObj selectedDentist = mDentistAdapter.getItem(position);
-                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+                    Intent intent = new Intent(getActivity(), DetailActivity.class);
 
-                // Get necessary information from DentistObj and send it to the new Intent.
-                intent.putExtra("NIMI", selectedDentist.dentistName());
-                intent.putExtra("OSOITE", selectedDentist.dentistOsoite());
-                intent.putExtra("POSTINUMERO", selectedDentist.dentistPostinumero());
-                intent.putExtra("POSTITOIMIPAIKKA", selectedDentist.dentistPostitoimipaikka());
-                intent.putExtra("PUHELIN", selectedDentist.dentistPuhelin());
-                intent.putExtra("URL", selectedDentist.dentistLinkURL());
-                startActivity(intent);
+                    // Query necessary information and start intent.
+                    intent.setData(DentistContract.DentistEntry.buildDentistIdUri(cursor.getString(COL_D_id)));
+
+                    startActivity(intent);
+                }
 
 
             }
@@ -86,18 +100,45 @@ public class DentistFragment extends android.support.v4.app.Fragment {
     }
 
     @Override
-    public void onStart() {
-        Log.v(LOG_TAG, "in onStart");
-        super.onStart();
+    public void onActivityCreated(Bundle savedInstanceState) {
+        Log.v(LOG_TAG, "in onActivityCreated");
+        getLoaderManager().initLoader(DENTIST_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
         updateDentists();
     }
 
     private void updateDentists(){
         Log.v(LOG_TAG, "in updateDentists");
-        FetchDentistTask dentistTask = new FetchDentistTask();
+        FetchDentistTask dentistTask = new FetchDentistTask(getActivity());
         dentistTask.execute();
     }
 
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        String sortOrder = DentistContract.DentistEntry.COLUMN_name + " ASC";
+        Uri dentistsUri = DentistContract.DentistEntry.buildDentistBasicUri();
+
+        return new CursorLoader(getActivity(),
+                dentistsUri,
+                DENTIST_COLUMNS,
+                null,
+                null,
+                sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mDentistAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mDentistAdapter.swapCursor(null);
+    }
+
+/*
     public class FetchDentistTask extends AsyncTask<Void, Void, List<DentistObj>> {
 
         private final String LOG_TAG = FetchDentistTask.class.getSimpleName();
@@ -229,5 +270,5 @@ public class DentistFragment extends android.support.v4.app.Fragment {
 
 
     }
-
+*/
 }

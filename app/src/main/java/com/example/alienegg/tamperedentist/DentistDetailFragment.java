@@ -1,8 +1,13 @@
 package com.example.alienegg.tamperedentist;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +15,9 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-public class DentistDetailFragment extends android.support.v4.app.Fragment {
+import com.example.alienegg.tamperedentist.data.DentistContract;
+
+public class DentistDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final String LOG_TAG = DentistDetailFragment.class.getSimpleName();
 
@@ -33,8 +40,32 @@ public class DentistDetailFragment extends android.support.v4.app.Fragment {
     private ImageButton Phone;
     private ImageButton Browser;
 
-    public DentistDetailFragment(){}
+    public DentistDetailFragment(){
+        //setHasOptionsMenu(false);
+    }
 
+    private static final int DETAIL_LOADER = 0;
+
+
+    // Get the columns we need.
+    private static final String[] DENTIST_COLUMNS = {
+            DentistContract.DentistEntry.TABLE_NAME + "." + DentistContract.DentistEntry._ID,
+            DentistContract.DentistEntry.COLUMN_D_id,
+            DentistContract.DentistEntry.COLUMN_name,
+            DentistContract.DentistEntry.COLUMN_address,
+            DentistContract.DentistEntry.COLUMN_zip,
+            DentistContract.DentistEntry.COLUMN_city,
+            DentistContract.DentistEntry.COLUMN_phone,
+            DentistContract.DentistEntry.COLUMN_urlLink
+    };
+    // These correspond the same values defined in DentistFragment.java
+    static final int COL_D_id = 1;
+    static final int COL_name = 2;
+    static final int COL_address = 3;
+    static final int COL_zip = 4;
+    static final int COL_city = 5;
+    static final int COL_phone = 6;
+    static final int COL_urlLink = 7;
 
     // TODO save data for recreation.
 
@@ -63,6 +94,10 @@ public class DentistDetailFragment extends android.support.v4.app.Fragment {
         Maps = (ImageButton)rootView.findViewById(R.id.GoogleMapsImageView);
         Phone = (ImageButton)rootView.findViewById(R.id.phoneImageView);
         Browser = (ImageButton)rootView.findViewById(R.id.browserImageView);
+
+
+
+
 
         Maps.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,30 +147,7 @@ public class DentistDetailFragment extends android.support.v4.app.Fragment {
             }
         });
 
-        // Populate fields via intent.
-        Intent intent = getActivity().getIntent();
-        if (intent != null && intent.hasExtra("NIMI")
-                && intent.hasExtra("OSOITE")
-                && intent.hasExtra("POSTINUMERO")
-                && intent.hasExtra("POSTITOIMIPAIKKA")
-                && intent.hasExtra("PUHELIN")
-                && intent.hasExtra("URL"))
-        {
-            phoneNumber = intent.getStringExtra("PUHELIN");
-            URLlink = intent.getStringExtra("URL");
-            zipCode = intent.getStringExtra("POSTINUMERO");
-            postalCity = intent.getStringExtra("POSTITOIMIPAIKKA");
-            streetAddress = intent.getStringExtra("OSOITE")
-                    + " " + zipCode
-                    + " " + postalCity;
 
-            dentistTitleTextView.setText(intent.getStringExtra("NIMI"));
-            phoneTextView.setText(phoneNumber);
-            linkURLTextView.setText(URLlink);
-            streetAddressTextView.setText(intent.getStringExtra("OSOITE"));
-            ZIP_CityTextView.setText(intent.getStringExtra("POSTINUMERO")
-                    + " " + intent.getStringExtra("POSTITOIMIPAIKKA"));
-        }
 
         // Populate fields via savedInstanceState.
         if (savedInstanceState != null)
@@ -170,6 +182,61 @@ public class DentistDetailFragment extends android.support.v4.app.Fragment {
         outstate.putString("POSTITOIMIPAIKKA", postalCity);
         outstate.putString("POSTINUMERO", zipCode);
         outstate.putString("NIMI", dentistTitleTextView.getText().toString());
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(DETAIL_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v(LOG_TAG, "In onCreateLoader");
+        Intent intent = getActivity().getIntent();
+        if (intent == null) {
+            return null;
+        }
+
+        // Now create and return a CursorLoader that will take care of
+        // creating a Cursor for the data being displayed.
+        return new CursorLoader(
+                getActivity(),
+                intent.getData(),
+                DENTIST_COLUMNS,
+                null,
+                null,
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.v(LOG_TAG, "In onLoadFinished");
+
+        // Populate fields via cursor.
+        if (!data.moveToFirst()){return;}
+
+            phoneNumber = data.getString(COL_phone);
+            URLlink = data.getString(COL_urlLink);
+            zipCode = data.getString(COL_zip);
+            postalCity = data.getString(COL_city);
+            streetAddress = data.getString(COL_address)
+                    + " " + zipCode
+                    + " " + postalCity;
+
+            dentistTitleTextView.setText(data.getString(COL_name));
+            phoneTextView.setText(phoneNumber);
+            linkURLTextView.setText(URLlink);
+            streetAddressTextView.setText(data.getString(COL_address));
+            ZIP_CityTextView.setText(zipCode
+                    + " " + postalCity);
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 
     // TODO get appropriate default application icons for the intents, if possible.

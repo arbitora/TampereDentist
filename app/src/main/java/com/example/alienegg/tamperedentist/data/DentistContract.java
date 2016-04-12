@@ -40,7 +40,7 @@ public class DentistContract{
         public static final String COLUMN_D_id = "D_id";
         // Stores the name of the dentist.
         public static final String COLUMN_name = "name";
-        // Stores the streetaddress for the dentist.
+        // Stores the street address for the dentist.
         public static final String COLUMN_address = "address";
         // Stores the zip code of the dentist.
         public static final String COLUMN_zip = "zip";
@@ -56,8 +56,17 @@ public class DentistContract{
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+        public static Uri buildDentistBasicUri(){
+            return CONTENT_URI;
+        }
+
+        public static String getDentistIDFromUri(Uri uri)
+        {
+            return uri.getPathSegments().get(1);
+        }
+
         public static Uri buildDentistIdUri(String searchID){
-            return CONTENT_URI.buildUpon().appendQueryParameter(COLUMN_D_id, searchID).build();
+            return CONTENT_URI.buildUpon().appendPath(searchID).build();
         }
 
     }

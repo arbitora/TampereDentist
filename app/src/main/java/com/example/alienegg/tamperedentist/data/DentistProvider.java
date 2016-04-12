@@ -6,6 +6,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.util.Log;
 
 /**
  * Created by AlienNest on 12.4.2016.
@@ -16,7 +17,7 @@ public class DentistProvider extends ContentProvider {
     private DentistDbHelper mOpenHelper;
 
     static final int DENTIST = 100;
-    static final int DENTIT_WITH_ID = 101;
+    static final int DENTIST_WITH_ID = 101;
 
     static UriMatcher buildUriMatcher(){
 
@@ -24,7 +25,7 @@ public class DentistProvider extends ContentProvider {
         final String authority = DentistContract.CONTENT_AUTHORITY;
 
         matcher.addURI(authority, DentistContract.PATH_DENTIST, DENTIST);
-        matcher.addURI(authority, DentistContract.PATH_DENTIST + "/*", DENTIT_WITH_ID);
+        matcher.addURI(authority, DentistContract.PATH_DENTIST + "/*", DENTIST_WITH_ID);
 
         return matcher;
     }
@@ -33,11 +34,12 @@ public class DentistProvider extends ContentProvider {
 
     private Cursor getDentistByID(Uri uri, String[] projection, String sortOrder) {
 
+        String dentistID = DentistContract.DentistEntry.getDentistIDFromUri(uri);
         return  mOpenHelper.getReadableDatabase().query(
                 DentistContract.DentistEntry.TABLE_NAME,
                 projection,
                 sDentistsByID,
-                new String[]{},
+                new String[]{dentistID},
                 null,
                 null,
                 sortOrder
@@ -56,10 +58,10 @@ public class DentistProvider extends ContentProvider {
     public String getType(Uri uri) {
         final int match = sUriMatcher.match(uri);
         switch (match){
+            case DENTIST_WITH_ID:
+                return DentistContract.DentistEntry.CONTENT_ITEM_TYPE;
             case DENTIST:
                 return DentistContract.DentistEntry.CONTENT_TYPE;
-            case DENTIT_WITH_ID:
-                return DentistContract.DentistEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -69,8 +71,13 @@ public class DentistProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor returnCursor;
-
+        Log.d("URI: ", uri.toString());
         switch (sUriMatcher.match(uri)){
+            case DENTIST_WITH_ID:
+            {
+                returnCursor = getDentistByID(uri, projection, sortOrder);
+                break;
+            }
             case DENTIST:
             {
                 returnCursor = mOpenHelper.getReadableDatabase().query(
@@ -82,11 +89,6 @@ public class DentistProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
-                break;
-            }
-            case DENTIT_WITH_ID:
-            {
-                returnCursor = getDentistByID(uri, projection, sortOrder);
                 break;
             }
             default:
