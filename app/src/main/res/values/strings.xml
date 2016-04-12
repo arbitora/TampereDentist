@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TampereDentist</string>
+    <string name="dentistTextView">Hospital name</string>
+    <string name="detailDentistNameTXTview">Dentist Name</string>
 </resources>

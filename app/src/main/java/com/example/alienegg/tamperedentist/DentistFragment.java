@@ -1,5 +1,6 @@
 package com.example.alienegg.tamperedentist;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +27,7 @@ import java.util.List;
  * Created by AlienNest on 11.4.2016.
  */
 public class DentistFragment extends android.support.v4.app.Fragment {
+
 
     //private ArrayAdapter<DentistObj> mDentistAdapter;
     private DentistObjAdapter mDentistAdapter;
@@ -61,12 +63,20 @@ public class DentistFragment extends android.support.v4.app.Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 // TODO create and open detailed dentist activity.
-                /*
-                DentistObj dentist = mDentistAdapter.getItem(position);
-                Intent intent = new Intent(getActivity(), DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, dentist);
+
+                // Get DentistObj which is at the corresponding position and start Detail intent for it.
+                DentistObj selectedDentist = mDentistAdapter.getItem(position);
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+
+                // Get necessary information from DentistObj and send it to the new Intent.
+                intent.putExtra("NIMI", selectedDentist.dentistName());
+                intent.putExtra("OSOITE", selectedDentist.dentistOsoite());
+                intent.putExtra("POSTINUMERO", selectedDentist.dentistPostinumero());
+                intent.putExtra("POSTITOIMIPAIKKA", selectedDentist.dentistPostitoimipaikka());
+                intent.putExtra("PUHELIN", selectedDentist.dentistPuhelin());
+                intent.putExtra("URL", selectedDentist.dentistLinkURL());
                 startActivity(intent);
-                */
+
             }
         });
 
