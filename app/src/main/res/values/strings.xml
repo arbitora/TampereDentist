@@ -5,5 +5,9 @@
     <string name="GoogleMapsImageView">Start Map application.</string>
     <string name="phoneImageView">Call to this phonenumber.</string>
     <string name="browserImageView">Start browser.</string>
+    <string name="streetAddressTXTview">Street Address</string>
+    <string name="ZIPcityTXTview">ZIP code City</string>
+    <string name="linkTXTview">http://www.sivusto.fi</string>
+    <string name="phoneTXTview">0401234567</string>
 </resources>
 

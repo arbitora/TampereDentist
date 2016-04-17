@@ -18,16 +18,16 @@
         android:text="@string/detailDentistNameTXTview"
         android:id="@+id/detailDentistNameTXTview"
         android:textColor="@color/Text.Color"
-        android:textSize="30sp"
+        android:textSize="26sp"
         android:gravity="left|start" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Street Address"
+        android:text="@string/streetAddressTXTview"
         android:id="@+id/streetAddressTXTview"
-        android:textSize="25sp"
+        android:textSize="22sp"
         android:layout_below="@+id/detailDentistNameTXTview"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -38,9 +38,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="ZIP code City"
+        android:text="@string/ZIPcityTXTview"
         android:id="@+id/ZIPcityTXTview"
-        android:textSize="25sp"
+        android:textSize="22sp"
         android:layout_below="@+id/streetAddressTXTview"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -62,11 +62,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="0401234567"
+        android:text="@string/phoneTXTview"
         android:id="@+id/phoneTXTview"
         android:layout_gravity="center_vertical"
-        android:textSize="25sp"
-        android:layout_below="@+id/ZIPcityTXTview"
+        android:textSize="22sp"
+        android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -78,15 +78,15 @@
         android:contentDescription="@string/phoneImageView"
         android:background="@drawable/button_selector"
         android:layout_gravity="right"
-        android:layout_alignTop="@+id/phoneTXTview"
-        android:layout_alignLeft="@+id/GoogleMapsImageView"
-        android:layout_alignStart="@+id/GoogleMapsImageView" />
+        android:layout_below="@+id/ZIPcityTXTview"
+        android:layout_toRightOf="@+id/ZIPcityTXTview"
+        android:layout_toEndOf="@+id/ZIPcityTXTview" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="http://www.sivusto.fi"
+        android:text="@string/linkTXTview"
         android:textSize="16sp"
         android:id="@+id/linkTXTview"
         android:layout_alignTop="@+id/browserImageView"
