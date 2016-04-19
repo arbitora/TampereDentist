@@ -29,11 +29,14 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
     private TextView ZIP_CityTextView;
 
     // Data used in opening intents.
-    private String phoneNumber; // tel: prefix required.
+    private String phoneNumber; // tel: prefix required when calling intent.
     private String streetAddress;
     private String URLlink;
     private String zipCode;
     private String postalCity;
+
+    private Double latitude;
+    private Double longitude;
 
     // For loading appropriate icons into them.
     private ImageButton Maps;
@@ -44,8 +47,8 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
         //setHasOptionsMenu(false);
     }
 
-    private static final int DETAIL_LOADER = 0;
 
+    private static final int DETAIL_LOADER = 0;
 
     // Get the columns we need.
     private static final String[] DENTIST_COLUMNS = {
@@ -56,9 +59,11 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
             DentistContract.DentistEntry.COLUMN_zip,
             DentistContract.DentistEntry.COLUMN_city,
             DentistContract.DentistEntry.COLUMN_phone,
-            DentistContract.DentistEntry.COLUMN_urlLink
+            DentistContract.DentistEntry.COLUMN_urlLink,
+            DentistContract.DentistEntry.COLUMN_latitude,
+            DentistContract.DentistEntry.COLUMN_longitude
     };
-    // These correspond the same values defined in DentistFragment.java
+    // These correspond the same values defined in DentistFragment.java, so we can easily use these to identify the columns in the code.
     static final int COL_D_id = 1;
     static final int COL_name = 2;
     static final int COL_address = 3;
@@ -66,8 +71,9 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
     static final int COL_city = 5;
     static final int COL_phone = 6;
     static final int COL_urlLink = 7;
+    static final int COL_latitude = 8;
+    static final int COL_longitude = 9;
 
-    // TODO save data for recreation.
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -95,31 +101,30 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
         Phone = (ImageButton)rootView.findViewById(R.id.phoneImageView);
         Browser = (ImageButton)rootView.findViewById(R.id.browserImageView);
 
-
-
-
-
+        // Open google maps with the given latitude and longitude.
         Maps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.v(LOG_TAG, "in onClick Maps Button");
-                // TODO start default Maps application.
-                Uri mapsLocation = Uri.parse("geo:0,0?q=" + streetAddress);
+                // Old Uri used streetaddress to find location, new one uses latitude and longitude.
+                //Uri mapsLocation = Uri.parse("geo:0,0?q=" + streetAddress);
+                //Uri mapsLocation = Uri.parse("geo:" + latitude + "," + longitude);
+                Uri mapsLocation = Uri.parse("geo:" + latitude + "," + longitude + "?q=" + streetAddress);
                 Intent mapsI = new Intent(Intent.ACTION_VIEW, mapsLocation);
                 try{
                     startActivity(mapsI);
                 } catch(Exception e){
-                    Log.v(LOG_TAG, "in onClick Browser Button; No Browser?");
+                    Log.v(LOG_TAG, "in onClick Maps Button; No Maps application?");
                     e.printStackTrace();
                 }
             }
         });
 
+        // Open dialer with the given phone number.
         Phone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.v(LOG_TAG, "in onClick Phone Button");
-                // TODO start default call application.
                 Intent call = new Intent(Intent.ACTION_DIAL);
                 call.setData(Uri.parse("tel:" + phoneNumber));
                 try{
@@ -131,11 +136,11 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
             }
         });
 
+        // Open the browser with the given web address.
         Browser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.v(LOG_TAG, "in onClick Browser Button");
-                // TODO start default browser application.
                 Intent browser = new Intent(Intent.ACTION_VIEW);
                 browser.setData(Uri.parse(URLlink));
                 try{
@@ -157,6 +162,8 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
             streetAddress = savedInstanceState.getString("OSOITE")
                     + " " + savedInstanceState.getString("POSTINUMERO")
                     + " " + savedInstanceState.getString("POSTITOIMIPAIKKA");
+            latitude = savedInstanceState.getDouble("latitude");
+            longitude = savedInstanceState.getDouble("longitude");
             dentistTitleTextView.setText(savedInstanceState.getString("NIMI"));
             phoneTextView.setText(savedInstanceState.getString("PUHELIN"));
             linkURLTextView.setText(savedInstanceState.getString("URL"));
@@ -182,6 +189,8 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
         outstate.putString("POSTITOIMIPAIKKA", postalCity);
         outstate.putString("POSTINUMERO", zipCode);
         outstate.putString("NIMI", dentistTitleTextView.getText().toString());
+        outstate.putDouble("latitude", latitude);
+        outstate.putDouble("longitude", longitude);
     }
 
     @Override
@@ -214,7 +223,7 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "In onLoadFinished");
 
-        // Populate fields via cursor.
+        // Populate fields and variables with the data in the cursor.
         if (!data.moveToFirst()){return;}
 
             phoneNumber = data.getString(COL_phone);
@@ -231,7 +240,11 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
             streetAddressTextView.setText(data.getString(COL_address));
             ZIP_CityTextView.setText(zipCode
                     + " " + postalCity);
+        latitude = data.getDouble(COL_latitude);
+        longitude = data.getDouble(COL_longitude);
 
+        Log.d("Latitude ", latitude.toString());
+        Log.d("Longitude ", longitude.toString());
     }
 
     @Override
@@ -239,5 +252,4 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
 
     }
 
-    // TODO get appropriate default application icons for the intents, if possible.
 }

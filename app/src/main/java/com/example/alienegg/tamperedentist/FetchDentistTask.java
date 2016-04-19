@@ -31,6 +31,7 @@ public class FetchDentistTask extends AsyncTask<Void, Void, List<DentistObj>> {
     private final Context mContext;
 
     public FetchDentistTask(Context context){
+        Log.v(LOG_TAG, "in constructor");
         mContext = context;
     }
 
@@ -49,10 +50,19 @@ public class FetchDentistTask extends AsyncTask<Void, Void, List<DentistObj>> {
             // Loop through JSONArray and add all content into temporary DentistObj
             for (int i = 0; i < dentistFeatures.length(); i++)
             {
+                // For each feature, get dentist.
                 JSONObject dentist = dentistFeatures.getJSONObject(i);
+                // From dentist we can parse ID.
                 String _id = dentist.getString("id");
+                // From dentist we need to parse Geomtry Array which holds latitude and longitude.
+                JSONObject dentistGeometry = dentist.getJSONObject("geometry");
+                JSONArray dentistCoordinates = dentistGeometry.getJSONArray("coordinates");
+                // From dentist we parse the dentist properties.
                 JSONObject dentistProperties = dentist.getJSONObject("properties");
+
+                // Parse dentist data into DentistObj.
                 String _nimi = dentistProperties.getString("NIMI");
+
                 // Hardcoded string fix.
                 if (_nimi.equals("Kaukajärjven hammashoitola"))
                 {
@@ -65,8 +75,14 @@ public class FetchDentistTask extends AsyncTask<Void, Void, List<DentistObj>> {
                 String _postitoimipaikka = dentistProperties.getString("POSTITOIMIPAIKKA");
                 String _linkURL = dentistProperties.getString("URL");
                 String _puhelin = dentistProperties.getString("PUHELIN");
-                temp = new DentistObj( _id,  _nimi,  _osoite,
-                        _postinumero,  _postitoimipaikka,  _linkURL,  _puhelin);
+                Double _longitude = dentistCoordinates.getDouble(0);
+                Double _latitude = dentistCoordinates.getDouble(1);
+
+                // See DentistObj parameter constructor for correct order.
+                temp = new DentistObj(_id, _nimi,
+                        _osoite, _postinumero, _postitoimipaikka,
+                        _linkURL, _puhelin,
+                        _longitude, _latitude);
                 mTempDentistList.add(temp);
             }
         }
@@ -83,6 +99,8 @@ public class FetchDentistTask extends AsyncTask<Void, Void, List<DentistObj>> {
     @Override
     protected List<DentistObj> doInBackground(Void... params) {
         Log.v(LOG_TAG, "in doInBackground");
+
+
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
         HttpURLConnection urlConnection = null;
@@ -92,11 +110,13 @@ public class FetchDentistTask extends AsyncTask<Void, Void, List<DentistObj>> {
         String dentistJsonStr = null;
 
         try {
-            // Construct the URL for the OpenWeatherMap query
-            // Possible parameters are avaiable at OWM's forecast API page, at
-            // http://openweathermap.org/API#forecast
-            final String DENTIST_BASE_URL = "http://opendata.navici.com/tampere/opendata/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=opendata:HAMMASHOITOLAT&outputFormat=json";
-            URL url = new URL(DENTIST_BASE_URL);
+            final String OPENDATA_BASE_URL = "http://opendata.navici.com/tampere/opendata/ows?service=WFS&version=2.0.0";
+            final String REQUEST_OPEN_TYPE = "&request=GetFeature&typeName=opendata:HAMMASHOITOLAT"; // We are getting dentist data.
+            final String OUTPUT_FORMAT = "&outputFormat=json"; // Get data as JSON format.
+            final String LOCATION_TYPE = "&srsName=EPSG:4326"; // Get location as Latitude and Longitude.
+
+            // Build URL based on the strings.
+            URL url = new URL(OPENDATA_BASE_URL + REQUEST_OPEN_TYPE + OUTPUT_FORMAT + LOCATION_TYPE);
 
             // Create the request to get HAMMASHOITOLAT data from opendata.navici.com/tampere
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -151,24 +171,29 @@ public class FetchDentistTask extends AsyncTask<Void, Void, List<DentistObj>> {
     @Override
     protected void onPostExecute(List<DentistObj> result){
         Log.v(LOG_TAG, "in onPostExecute");
+        // If there are results, create ContentValue vector out of the DentistObj list.
         if (result != null)
         {
             Vector<ContentValues> cVVector = new Vector<ContentValues>(result.size());
 
             for(DentistObj insertDentist : result){
                 ContentValues dentistValues = new ContentValues();
-                dentistValues.put(DentistContract.DentistEntry.COLUMN_D_id, insertDentist.dentistID());
-                dentistValues.put(DentistContract.DentistEntry.COLUMN_name, insertDentist.dentistName());
-                dentistValues.put(DentistContract.DentistEntry.COLUMN_address, insertDentist.dentistOsoite());
-                dentistValues.put(DentistContract.DentistEntry.COLUMN_zip, insertDentist.dentistPostinumero());
-                dentistValues.put(DentistContract.DentistEntry.COLUMN_city, insertDentist.dentistPostitoimipaikka());
-                dentistValues.put(DentistContract.DentistEntry.COLUMN_phone, insertDentist.dentistPuhelin());
-                dentistValues.put(DentistContract.DentistEntry.COLUMN_urlLink, insertDentist.dentistLinkURL());
+                // Link the Dentist's data with the columns in the database found in DentistContract
+                dentistValues.put(DentistContract.DentistEntry.COLUMN_D_id, insertDentist.getId());
+                dentistValues.put(DentistContract.DentistEntry.COLUMN_name, insertDentist.getNimi());
+                dentistValues.put(DentistContract.DentistEntry.COLUMN_address, insertDentist.getOsoite());
+                dentistValues.put(DentistContract.DentistEntry.COLUMN_zip, insertDentist.getPostinumero());
+                dentistValues.put(DentistContract.DentistEntry.COLUMN_city, insertDentist.getPostitoimipaikka());
+                dentistValues.put(DentistContract.DentistEntry.COLUMN_phone, insertDentist.getPuhelin());
+                dentistValues.put(DentistContract.DentistEntry.COLUMN_urlLink, insertDentist.getLinkURL());
+                dentistValues.put(DentistContract.DentistEntry.COLUMN_latitude, insertDentist.getLatitude());
+                dentistValues.put(DentistContract.DentistEntry.COLUMN_longitude, insertDentist.getLongitude());
                 cVVector.add(dentistValues);
             }
 
-            int inserted = 0;
+            int inserted = 0; // For log message, counts how many rows were inserted.
             if (cVVector.size() > 0) {
+                // Convert vector into array so it can be inserted into database.
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
                 inserted = mContext.getContentResolver().bulkInsert(DentistContract.DentistEntry.CONTENT_URI, cvArray);

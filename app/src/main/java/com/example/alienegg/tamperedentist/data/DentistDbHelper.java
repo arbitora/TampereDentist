@@ -13,9 +13,18 @@ import com.example.alienegg.tamperedentist.data.DentistContract.DentistEntry;
 
 public class DentistDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    /*
+        VERSION MUST ALWAYS CHANGE IF CHANGES HAVE BEEN MADE INTO DATABASE CODE.
+
+        VERSION = 1, first build
+        VERSION = 2, added Latitude and Longitude columns.
+    */
+    private static final int DATABASE_VERSION = 2;
+
+    // Declare database name.
     static final String DATABASE_NAME = "dentists.db";
 
+    // Constructor
     public DentistDbHelper(Context context)
     {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -29,7 +38,7 @@ public class DentistDbHelper extends SQLiteOpenHelper {
                 // Unique ID, which will have Autoincrement
                 DentistEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
 
-                // the ID of the location entry associated with this weather data
+                // Create the rest of the columns to store Dentist's data.
                 DentistEntry.COLUMN_D_id + " TEXT NOT NULL, " +
                 DentistEntry.COLUMN_name + " TEXT NOT NULL, " +
                 DentistEntry.COLUMN_address + " TEXT NOT NULL, " +
@@ -37,7 +46,8 @@ public class DentistDbHelper extends SQLiteOpenHelper {
                 DentistEntry.COLUMN_city + " TEXT NOT NULL, " +
                 DentistEntry.COLUMN_phone + " TEXT NOT NULL, " +
                 DentistEntry.COLUMN_urlLink + " TEXT NOT NULL, " +
-
+                DentistEntry.COLUMN_latitude + " DOUBLE NOT NULL, " +
+                DentistEntry.COLUMN_longitude + " DOUBLE NOT NULL, " +
                 // To assure the application will have only one dentist which is found from the dentist ID.
                 " UNIQUE (" + DentistEntry.COLUMN_D_id + ") ON CONFLICT REPLACE);";
 
@@ -47,12 +57,12 @@ public class DentistDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        // This database is only a cache for online data, so its upgrade policy is
-        // to simply to discard the data and start over
-        // Note that this only fires if you change the version number for your database.
-        // It does NOT depend on the version number for your application.
-        // If you want to update the schema without wiping data, commenting out the next 2 lines
-        // should be your top priority before modifying this method.
+        /*
+            This database stores the online data in a cache, so if changes are made,
+            we can discard all data and load the data into it's new proper locations.
+
+            This function will only run if DATABASE_VERSION has been changed.
+        */
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DentistEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }

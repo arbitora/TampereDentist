@@ -9,30 +9,32 @@ public class DentistObj implements Comparable<DentistObj>{
 
     // All data can be found in the path: features -> []
     private String id; //[] -> id:
-    //private String geoLocCoordinates // [] -> geometry -> coordinates[]
     private String nimi; // [] -> properties -> NIMI:
     private String osoite; // [] -> properties -> OSOITE:
     private String postinumero; // [] -> properties -> POSTINUMERO:
     private String postitoimipaikka; // [] -> properties -> POSTITOIMIPAIKKA:
     private String linkURL; // [] -> properties -> URL:
     private String puhelin; // [] -> properties -> PUHELIN:
+    private Double latitude; // [] -> geometry -> coordinates[1]
+    private Double longitude; // [] -> geometry -> coordinates[0]
 
     // Default constructor
     public DentistObj()
     {
         id = "null";
-        // geoLocCoordinates = new String["", ""]
         nimi = "unnamed";
         osoite = "";
         postinumero = "";
         postitoimipaikka = "";
         linkURL = "-";
         puhelin = "-";
+        longitude = 0.0;
+        latitude = 0.0;
     }
 
     // Parameter constructor (used when loading data from servers)
     public DentistObj(String _id, String _nimi, String _osoite,
-                      String _postinumero, String _postitoimipaikka, String _linkURL, String _puhelin)
+                      String _postinumero, String _postitoimipaikka, String _linkURL, String _puhelin, Double _longitude, Double _latitude)
     {
         id = _id;
         // geoLocCoordinates = new String["", ""]
@@ -42,11 +44,13 @@ public class DentistObj implements Comparable<DentistObj>{
         postitoimipaikka = _postitoimipaikka;
         linkURL = _linkURL;
         puhelin = _puhelin;
+        longitude = _longitude;
+        latitude = _latitude;
     }
 
     // Basic equals function for DentistObj
     /*
-		Compares if two DentistObjs are the same.
+        Compares if two DentistObjs are the same, comparing via it's ID.
 	*/
     public boolean equals(DentistObj temp)
     {
@@ -56,38 +60,44 @@ public class DentistObj implements Comparable<DentistObj>{
             return false;
     }
 
-    public String dentistID(){return id; }
+    /*
+        Data get functions, each returning the given value.
+    */
+    public String getId() {
+        return id;
+    }
 
-    public String dentistName()
-    {
+    public String getNimi() {
         return nimi;
     }
 
-    public String dentistOsoite()
-    {
+    public String getOsoite() {
         return osoite;
     }
 
-    public String dentistPostinumero()
-    {
-        return postinumero;
-    }
-
-    public String dentistPostitoimipaikka()
-    {
-        return postitoimipaikka;
-    }
-
-    public String dentistLinkURL()
-    {
+    public String getLinkURL() {
         return linkURL;
     }
 
-    public String dentistPuhelin()
-    {
+    public String getPostinumero() {
+        return postinumero;
+    }
+
+    public String getPostitoimipaikka() {
+        return postitoimipaikka;
+    }
+
+    public String getPuhelin() {
         return puhelin;
     }
 
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
 
     // Overriding collection comparations.
     // There are used when sorting items in the list.

@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (savedInstanceState != null)
         {
-            // TODO Get data back or vice versa.
+            // DO nothing.
         }
     }
 

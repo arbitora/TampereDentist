@@ -50,6 +50,10 @@ public class DentistContract{
         public static final String COLUMN_phone = "phone";
         // Stores the URL link of the dentist.
         public static final String COLUMN_urlLink = "urlLink";
+        // Stores the URL link of the dentist.
+        public static final String COLUMN_latitude = "latitude";
+        // Stores the URL link of the dentist.
+        public static final String COLUMN_longitude = "longitude";
 
 
         public static Uri buildDentistUri(long id){
@@ -60,6 +64,10 @@ public class DentistContract{
             return CONTENT_URI;
         }
 
+        public static Uri buildDentistCountUri() {
+            return CONTENT_URI.buildUpon().appendPath("0").build();
+        }
+
         public static String getDentistIDFromUri(Uri uri)
         {
             return uri.getPathSegments().get(1);
@@ -68,6 +76,7 @@ public class DentistContract{
         public static Uri buildDentistIdUri(String searchID){
             return CONTENT_URI.buildUpon().appendPath(searchID).build();
         }
+
 
     }
 }

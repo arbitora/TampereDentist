@@ -10,5 +10,9 @@
     <string name="ZIPcityTXTview">ZIP code City</string>
     <string name="linkTXTview">http://www.sivusto.fi</string>
     <string name="phoneTXTview">0401234567</string>
+    <string name="networkError">No internet connection!</string>
+    <string name="emptyTableError">No dentists found!
+        Open internet connection and retry.</string>
+    <string name="BTNretry">Search again</string>
 </resources>
 

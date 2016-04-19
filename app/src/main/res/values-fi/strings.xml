@@ -10,5 +10,9 @@
     <string name="ZIPcityTXTview">Postinumero ja -paikka</string>
     <string name="linkTXTview">http://www.sivusto.fi</string>
     <string name="phoneTXTview">0401234567</string>
+    <string name="networkError">Ei verkkoyhteyttä!</string>
+    <string name="emptyTableError">Hammaslääkäreitä ei löydetty!
+        Muodosta verkkoyhteys ja yritä uudelleen.</string>
+    <string name="BTNretry">Hae uudelleen</string>
 </resources>
 
