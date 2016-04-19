@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tampere Hammaslääkärit</string>
+    <string name="dentistTextView">Hammaslääkärin sijainti</string>
+    <string name="detailDentistNameTXTview">Hammaslääkärin nimi</string>
+    <string name="GoogleMapsImageView">Avaa kartta -sovellus.</string>
+    <string name="phoneImageView">Soita tähän hammaslääkäriin.</string>
+    <string name="browserImageView">Avaa linkki selaimessa.</string>
+    <string name="streetAddressTXTview">Katuosoite</string>
+    <string name="ZIPcityTXTview">Postinumero ja -paikka</string>
+    <string name="linkTXTview">http://www.sivusto.fi</string>
+    <string name="phoneTXTview">0401234567</string>
+</resources>
+
