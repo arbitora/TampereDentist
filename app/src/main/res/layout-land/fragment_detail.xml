@@ -18,8 +18,13 @@
         android:text="@string/detailDentistNameTXTview"
         android:id="@+id/detailDentistNameTXTview"
         android:textColor="@color/Text.Color"
-        android:textSize="26sp"
-        android:gravity="left|start" />
+        android:textSize="24sp"
+        android:gravity="left|start"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/GoogleMapsImageView"
+        android:layout_toStartOf="@+id/GoogleMapsImageView" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -54,9 +59,9 @@
         android:src="@mipmap/ic_launch_maps"
         android:contentDescription="@string/GoogleMapsImageView"
         android:background="@drawable/button_selector"
-        android:layout_alignTop="@+id/streetAddressTXTview"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignTop="@+id/detailDentistNameTXTview"
+        android:layout_alignLeft="@+id/phoneImageView"
+        android:layout_alignStart="@+id/phoneImageView" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -66,7 +71,7 @@
         android:id="@+id/phoneTXTview"
         android:layout_gravity="center_vertical"
         android:textSize="22sp"
-        android:layout_centerVertical="true"
+        android:layout_below="@+id/ZIPcityTXTview"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -77,10 +82,10 @@
         android:src="@mipmap/ic_launch_phone"
         android:contentDescription="@string/phoneImageView"
         android:background="@drawable/button_selector"
-        android:layout_gravity="right"
-        android:layout_below="@+id/ZIPcityTXTview"
-        android:layout_toRightOf="@+id/ZIPcityTXTview"
-        android:layout_toEndOf="@+id/ZIPcityTXTview" />
+        android:layout_alignTop="@+id/phoneTXTview"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="5sp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -89,11 +94,9 @@
         android:text="@string/linkTXTview"
         android:textSize="16sp"
         android:id="@+id/linkTXTview"
-        android:layout_alignTop="@+id/browserImageView"
+        android:layout_below="@+id/phoneImageView"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@+id/browserImageView"
-        android:layout_toStartOf="@+id/browserImageView" />
+        android:layout_alignParentStart="true" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -102,10 +105,9 @@
         android:src="@mipmap/ic_launch_browser"
         android:contentDescription="@string/browserImageView"
         android:background="@drawable/button_selector"
-        android:layout_gravity="right"
-        android:layout_alignParentBottom="true"
-        android:layout_alignLeft="@+id/phoneImageView"
-        android:layout_alignStart="@+id/phoneImageView" />
+        android:layout_alignTop="@+id/linkTXTview"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 
 </RelativeLayout>

@@ -59,7 +59,15 @@ public class DentistFragment extends Fragment implements LoaderManager.LoaderCal
     static final int COL_urlLink = 7;
     */
 
-    public enum DATABASE_QUERY {QUERY_DENTIST, QUERY_COUNT, NO_QUERY, QUERY_DENTIST_NOT_FOUND}
+    /*
+    QUERY_DENTIST = 0
+    QUERY_COUNT = 1
+    NO_QUERY = 2
+    QUERY_DENTIST_NOT_FOUND = 3
+     */
+    public enum DATABASE_QUERY {
+        QUERY_DENTIST, QUERY_COUNT, NO_QUERY, QUERY_DENTIST_NOT_FOUND, ERROR
+    }
 
     ;
     DATABASE_QUERY queryStatus = DATABASE_QUERY.NO_QUERY;
@@ -120,22 +128,109 @@ public class DentistFragment extends Fragment implements LoaderManager.LoaderCal
         super.onActivityCreated(savedInstanceState);
 
 
-        if (savedInstanceState != null && savedInstanceState.getBoolean("restart"))
-            getLoaderManager().restartLoader(DENTIST_LOADER, null, this);
-        else
+        if (savedInstanceState != null) {
+
+            // If retry button was pressed, restart loaders.
+            if (savedInstanceState.getBoolean("restart"))
+                getLoaderManager().restartLoader(DENTIST_LOADER, null, this);
+
+            // Check if the value is proper value before adding it into queryStatus variable.
+            DATABASE_QUERY savedStatus = IntToStatus(savedInstanceState.getInt("queryStatus"));
+            if (savedStatus != DATABASE_QUERY.ERROR)
+                queryStatus = savedStatus;
+
+            // If retry button was created, recreate it (due to orientation change for exmaple).
+            if (savedInstanceState.getBoolean("retryButtonCreated"))
+                createRetryButton();
+        }
+
+        // If loader is not running, start loader.
+        if (!getLoaderManager().hasRunningLoaders())
             getLoaderManager().initLoader(DENTIST_LOADER, null, this);
 
     }
 
+
     private void updateDentists(){
         Log.v(LOG_TAG, "in updateDentists");
-
+        // Check for network before trying to connect to the servers.
         if (isNetworkAvailable(this.getContext())) {
             FetchDentistTask dentistTask = new FetchDentistTask(getActivity());
             dentistTask.execute();
         }
     }
 
+    /*
+    Converts DATABASE_QUERY status into integer.
+        QUERY_DENTIST = 0
+        QUERY_COUNT = 1
+        NO_QUERY = 2
+        QUERY_DENTIST_NOT_FOUND = 3
+
+        ERROR = -1
+     */
+    private int StatusToInt(DATABASE_QUERY status) {
+        int statusCode;
+        switch (status) {
+            case QUERY_DENTIST:
+                statusCode = 0;
+                break;
+
+            case QUERY_COUNT:
+                statusCode = 1;
+                break;
+
+            case NO_QUERY:
+                statusCode = 2;
+                break;
+
+            case QUERY_DENTIST_NOT_FOUND:
+                statusCode = 3;
+                break;
+
+            default:
+                statusCode = -1;
+                break;
+        }
+
+        return statusCode;
+    }
+
+    /*
+    Converts integer into DATABASE_QUERY status.
+        QUERY_DENTIST = 0
+        QUERY_COUNT = 1
+        NO_QUERY = 2
+        QUERY_DENTIST_NOT_FOUND = 3
+
+    -1 will return ERROR
+    */
+    private DATABASE_QUERY IntToStatus(int statusCode) {
+        DATABASE_QUERY status;
+        switch (statusCode) {
+            case 0:
+                status = DATABASE_QUERY.QUERY_DENTIST;
+                break;
+
+            case 1:
+                status = DATABASE_QUERY.QUERY_COUNT;
+                break;
+
+            case 2:
+                status = DATABASE_QUERY.NO_QUERY;
+                break;
+
+            case 3:
+                status = DATABASE_QUERY.QUERY_DENTIST_NOT_FOUND;
+                break;
+
+            default:
+                status = DATABASE_QUERY.ERROR;
+                break;
+        }
+
+        return status;
+    }
 
     private void createRetryButton() {
         // If it is already created, do not recreate it.
@@ -239,6 +334,16 @@ public class DentistFragment extends Fragment implements LoaderManager.LoaderCal
         Log.v(LOG_TAG, "in onLoaderReset");
 
         mDentistAdapter.swapCursor(null);
+    }
+
+
+    // Save necessary data to access it again, for example during orientation change.
+    @Override
+    public void onSaveInstanceState(Bundle outstate) {
+        super.onSaveInstanceState(outstate);
+        outstate.putBoolean("retryButtonCreated", retryButtonCreated); // Recreate button if it was created.
+        outstate.putInt("queryStatus", StatusToInt(queryStatus)); // saves DATABASE_QUERY enum as integer.
+
     }
 
     public static boolean isNetworkAvailable(Context context) {

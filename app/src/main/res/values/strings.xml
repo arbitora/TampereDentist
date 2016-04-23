@@ -8,7 +8,7 @@
     <string name="browserImageView">Start browser.</string>
     <string name="streetAddressTXTview">Street Address</string>
     <string name="ZIPcityTXTview">ZIP code City</string>
-    <string name="linkTXTview">http://www.sivusto.fi</string>
+    <string name="linkTXTview">http://www.web-address.fi</string>
     <string name="phoneTXTview">0401234567</string>
     <string name="networkError">No internet connection!</string>
     <string name="emptyTableError">No dentists found!
