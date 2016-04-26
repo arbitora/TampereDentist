@@ -10,16 +10,14 @@
             <corners android:radius="5sp" />
         </shape>
     </item>
-
-    <item android:state_selected="true" >
+    <item android:state_enabled="false">
         <shape>
-            <stroke android:color="@color/List.Item.Corners"
+            <stroke android:color="@color/List.Item.Corners.Darker"
                 android:width="5sp"/>
-            <solid android:color="@color/List.Item.Selected" />
+            <solid android:color="@color/List.Item.Disabled" />
             <corners android:radius="5sp" />
         </shape>
     </item>
-
     <item>
         <shape>
             <stroke android:color="@color/List.Item.Corners"
@@ -28,5 +26,4 @@
             <corners android:radius="5sp" />
         </shape>
     </item>
-
 </selector>

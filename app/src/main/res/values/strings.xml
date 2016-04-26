@@ -1,18 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Tampere Dentists</string>
+    <string name="tampere_dentist_icon">Tampere Dentist Icon</string>
     <string name="dentistTextView">Dentist Location name</string>
-    <string name="detailDentistNameTXTview">Dentist Name</string>
+    <string name="detailDentistNameTXTview">Dentist information is shown here</string>
     <string name="GoogleMapsImageView">Start Map application.</string>
     <string name="phoneImageView">Call to this phonenumber.</string>
     <string name="browserImageView">Start browser.</string>
-    <string name="streetAddressTXTview">Street Address</string>
-    <string name="ZIPcityTXTview">ZIP code City</string>
-    <string name="linkTXTview">http://www.web-address.fi</string>
-    <string name="phoneTXTview">0401234567</string>
-    <string name="networkError">No internet connection!</string>
+    <string name="streetAddressTXTview"></string>
+    <string name="ZIPcityTXTview"></string>
+    <string name="linkTXTview"></string>
+    <string name="phoneTXTview"></string>
+    <string name="networkError">No internet connection! Open internet connection and retry.</string>
     <string name="emptyTableError">No dentists found!
         Open internet connection and retry.</string>
     <string name="BTNretry">Search again</string>
+    <string name="OK">OK</string>
+    <string name="popup_version_text">Version number:</string>
+    <string name="popup_installDate_text">Insallation date:</string>
+
 </resources>
 

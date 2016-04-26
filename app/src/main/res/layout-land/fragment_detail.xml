@@ -6,9 +6,7 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:columnCount="3"
-    android:rowCount="3">
+    android:paddingTop="@dimen/activity_vertical_margin">
 
 
     <TextView
@@ -82,10 +80,9 @@
         android:src="@mipmap/ic_launch_phone"
         android:contentDescription="@string/phoneImageView"
         android:background="@drawable/button_selector"
-        android:layout_alignTop="@+id/phoneTXTview"
+        android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="5sp" />
+        android:layout_alignParentEnd="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -94,7 +91,7 @@
         android:text="@string/linkTXTview"
         android:textSize="16sp"
         android:id="@+id/linkTXTview"
-        android:layout_below="@+id/phoneImageView"
+        android:layout_alignTop="@+id/browserImageView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -105,7 +102,7 @@
         android:src="@mipmap/ic_launch_browser"
         android:contentDescription="@string/browserImageView"
         android:background="@drawable/button_selector"
-        android:layout_alignTop="@+id/linkTXTview"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 

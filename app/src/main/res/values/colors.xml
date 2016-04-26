@@ -5,8 +5,10 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="List.Item.Corners">#00438E</color>
+    <color name="List.Item.Corners.Darker">#002c5e</color>
     <color name="List.Item.Selected">#1483FF</color>
     <color name="List.Item.NotSelected">#ABD3FF</color>
+    <color name="List.Item.Disabled">#6e87a3</color>
 
     <color name="Text.URL_Color">#7BBAFF</color>
     <color name="Text.Color">#000000</color>

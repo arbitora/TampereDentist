@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@drawable/popupwindow_selector"
+    android:gravity="center_vertical|center_horizontal">
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_launcher"
+            android:contentDescription="@string/tampere_dentist_icon"
+            android:layout_marginTop="25sp" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="@color/Text.Color"
+            android:id="@+id/popup_versionTXT"
+            android:text="@string/popup_version_text"
+            android:layout_margin="10sp" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="@color/Text.Color"
+            android:id="@+id/popup_installDateTXT"
+            android:text="@string/popup_installDate_text"
+            android:layout_margin="10sp"
+            android:lines="2" />
+
+        <Button
+            android:id="@+id/popup_ok"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/OK"
+            android:textSize="20sp"
+            android:background="@drawable/button_selector"
+            android:layout_marginLeft="30sp"
+            android:layout_marginRight="30sp"
+            android:layout_marginBottom="25sp"
+            android:layout_marginTop="5sp" />
+</LinearLayout>

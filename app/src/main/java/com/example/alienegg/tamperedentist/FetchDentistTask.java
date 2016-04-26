@@ -1,8 +1,16 @@
 package com.example.alienegg.tamperedentist;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.CharArrayBuffer;
+import android.database.ContentObserver;
+import android.database.Cursor;
+import android.database.DataSetObserver;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.content.CursorLoader;
 import android.util.Log;
 
 import com.example.alienegg.tamperedentist.data.DentistContract;
@@ -29,61 +37,103 @@ public class FetchDentistTask extends AsyncTask<Void, Void, List<DentistObj>> {
 
     private final String LOG_TAG = FetchDentistTask.class.getSimpleName();
     private final Context mContext;
+    private int dentistCount = 0; // getCount of dentist in cached database.
 
-    public FetchDentistTask(Context context){
+    // Get the columns we need.
+    private static final String[] DENTIST_COLUMNS = {
+            DentistContract.DentistEntry.TABLE_NAME + "." + DentistContract.DentistEntry._ID,
+            DentistContract.DentistEntry.COLUMN_D_id,
+            DentistContract.DentistEntry.COLUMN_name
+			/*
+            DentistContract.DentistEntry.COLUMN_address,
+            DentistContract.DentistEntry.COLUMN_zip,
+            DentistContract.DentistEntry.COLUMN_city,
+            DentistContract.DentistEntry.COLUMN_phone,
+            DentistContract.DentistEntry.COLUMN_urlLink,
+			DentistContract.DentistEntry.COLUMN_latitude,
+            DentistContract.DentistEntry.COLUMN_longitude
+			*/
+    };
+
+    // These are used to find columns stated above.
+    // Change these to appropriate values, if above DENTIST_COLUMNS is changed.
+    static final int COL_D_id = 1;
+    static final int COL_name = 2;
+    /* not used in this fragment.
+    static final int COL_address = 3;
+    static final int COL_zip = 4;
+    static final int COL_city = 5;
+    static final int COL_phone = 6;
+    static final int COL_urlLink = 7;
+	static final int COL_latitude = 8;
+    static final int COL_longitude = 9;
+    */
+
+    // Count is number of dentists in the cached Database.
+    public FetchDentistTask(Context context, int count){
         Log.v(LOG_TAG, "in constructor");
         mContext = context;
+        dentistCount = count;
     }
 
 
-
+    // Parses JSON data from web request.
     private List<DentistObj> getDentistDataFromJSON(String dentistJSON)
     {
         List<DentistObj> mTempDentistList = new ArrayList<>();
         Log.v(LOG_TAG, "in getDentistDataFromJSON");
         try{
             JSONObject dentistCollection = new JSONObject(dentistJSON);
-            JSONArray dentistFeatures = dentistCollection.getJSONArray("features");
-            // Temporary DentistObj which is populated and added into list.
-            DentistObj temp;
 
-            // Loop through JSONArray and add all content into temporary DentistObj
-            for (int i = 0; i < dentistFeatures.length(); i++)
+            // If there are same amount of dentists in the database as in the collection,
+            // there is no need to parse and add these to database.
+            int totalFeatures = dentistCollection.getInt("totalFeatures");
+            if (totalFeatures != dentistCount)
             {
-                // For each feature, get dentist.
-                JSONObject dentist = dentistFeatures.getJSONObject(i);
-                // From dentist we can parse ID.
-                String _id = dentist.getString("id");
-                // From dentist we need to parse Geomtry Array which holds latitude and longitude.
-                JSONObject dentistGeometry = dentist.getJSONObject("geometry");
-                JSONArray dentistCoordinates = dentistGeometry.getJSONArray("coordinates");
-                // From dentist we parse the dentist properties.
-                JSONObject dentistProperties = dentist.getJSONObject("properties");
+                JSONArray dentistFeatures = dentistCollection.getJSONArray("features");
+                // Temporary DentistObj which is populated and added into list.
+                DentistObj temp;
 
-                // Parse dentist data into DentistObj.
-                String _nimi = dentistProperties.getString("NIMI");
 
-                // Hardcoded string fix.
-                if (_nimi.equals("Kaukajärjven hammashoitola"))
+                // Loop through JSONArray and add all content into temporary DentistObj
+                for (int i = 0; i < dentistFeatures.length(); i++)
                 {
-                    _nimi = null;
-                    if (_nimi == null)
-                        _nimi = "Kaukajärven hammashoitola";
-                }
-                String _osoite = dentistProperties.getString("OSOITE");
-                String _postinumero = dentistProperties.getString("POSTINUMERO");
-                String _postitoimipaikka = dentistProperties.getString("POSTITOIMIPAIKKA");
-                String _linkURL = dentistProperties.getString("URL");
-                String _puhelin = dentistProperties.getString("PUHELIN");
-                Double _longitude = dentistCoordinates.getDouble(0);
-                Double _latitude = dentistCoordinates.getDouble(1);
+                    // For each feature, get dentist.
+                    JSONObject dentist = dentistFeatures.getJSONObject(i);
+                    // From dentist we can parse ID.
+                    String _id = dentist.getString("id");
+                    // From dentist we need to parse Geomtry Array which holds latitude and longitude.
+                    JSONObject dentistGeometry = dentist.getJSONObject("geometry");
+                    JSONArray dentistCoordinates = dentistGeometry.getJSONArray("coordinates");
+                    // From dentist we parse the dentist properties.
+                    JSONObject dentistProperties = dentist.getJSONObject("properties");
 
-                // See DentistObj parameter constructor for correct order.
-                temp = new DentistObj(_id, _nimi,
-                        _osoite, _postinumero, _postitoimipaikka,
-                        _linkURL, _puhelin,
-                        _longitude, _latitude);
-                mTempDentistList.add(temp);
+                    // Parse dentist data into DentistObj.
+                    String _nimi = dentistProperties.getString("NIMI");
+
+                    // Hardcoded string fix.
+                    if (_nimi.equals("Kaukajärjven hammashoitola"))
+                    {
+                        _nimi = null;
+                        if (_nimi == null)
+                            _nimi = "Kaukajärven hammashoitola";
+                    }
+                    String _osoite = dentistProperties.getString("OSOITE");
+                    String _postinumero = dentistProperties.getString("POSTINUMERO");
+                    String _postitoimipaikka = dentistProperties.getString("POSTITOIMIPAIKKA");
+                    String _linkURL = dentistProperties.getString("URL");
+                    String _puhelin = dentistProperties.getString("PUHELIN");
+                    Double _longitude = dentistCoordinates.getDouble(0);
+                    Double _latitude = dentistCoordinates.getDouble(1);
+
+                    // See DentistObj parameter constructor for correct order.
+                    temp = new DentistObj(_id, _nimi,
+                            _osoite, _postinumero, _postitoimipaikka,
+                            _linkURL, _puhelin,
+                            _longitude, _latitude);
+                    mTempDentistList.add(temp);
+                }
+
             }
         }
         catch (JSONException e){
