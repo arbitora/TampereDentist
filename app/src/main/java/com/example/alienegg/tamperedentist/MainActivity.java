@@ -26,15 +26,13 @@ public class MainActivity extends ActionBarActivity implements DentistFragment.C
     private String version;
     private String installDate;
 
-    // Was the popup window created?
-    private boolean infoCreated = false;
     private static PopupWindow popupWindow = null;
 
     // Is it tablet view?
     private boolean mTabletPane;
+    public static final String TABLET_PANE = "mTabletPane";
+    public static String PACKAGE_NAME;
 
-    // SavedInstanceState strings
-    private static final String INFO_CREATED = "infoCreate";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,15 +40,22 @@ public class MainActivity extends ActionBarActivity implements DentistFragment.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        PACKAGE_NAME = getApplicationContext().getPackageName();
         if (findViewById(R.id.detail_dentist_container) != null)
         {
             // Only create tablet view mode if sw600 activity_main.xml is used.
             mTabletPane = true;
 
+            // Only create the view once.
             if (savedInstanceState == null)
             {
+                Bundle TwoPane = new Bundle();
+                TwoPane.putBoolean(TABLET_PANE, mTabletPane);
+
+                DentistDetailFragment detailFragment = new DentistDetailFragment();
+                detailFragment.setArguments(TwoPane);
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.detail_dentist_container, new DentistDetailFragment())
+                        .replace(R.id.detail_dentist_container, detailFragment)
                         .commit();
             }
         }
@@ -60,13 +65,6 @@ public class MainActivity extends ActionBarActivity implements DentistFragment.C
             mTabletPane = false;
         }
 
-
-        if (savedInstanceState != null)
-        {
-            infoCreated = savedInstanceState.getBoolean(INFO_CREATED);
-            if (infoCreated == true)
-                createPopUpView();
-        }
     }
 
     @Override
@@ -103,7 +101,7 @@ public class MainActivity extends ActionBarActivity implements DentistFragment.C
         {
             Bundle arguments = new Bundle();
             arguments.putParcelable(DentistDetailFragment.DETAIL_URI, contentUri);
-
+            arguments.putBoolean(TABLET_PANE, mTabletPane);
             DentistDetailFragment fragment = new DentistDetailFragment();
             fragment.setArguments(arguments);
 
@@ -116,6 +114,7 @@ public class MainActivity extends ActionBarActivity implements DentistFragment.C
         {
             Intent intent = new Intent (this, DetailActivity.class)
                     .setData(contentUri);
+            intent.putExtra(TABLET_PANE, mTabletPane);
             startActivity(intent);
         }
     }
@@ -151,14 +150,14 @@ public class MainActivity extends ActionBarActivity implements DentistFragment.C
                 @Override
                 public void onClick(View v) {
                     popupWindow.dismiss();
-                    infoCreated = false;
                 }
             });
 
             // Current view, Gravity, x Position, y Position.
-            popupWindow.showAtLocation(getCurrentFocus(), 1, 0, 0);
+            View thisView = findViewById(R.id.fragment_dentist);
+            if (thisView != null)
+                popupWindow.showAtLocation(thisView, 1, 0, 0);
 
-            infoCreated = true;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -167,8 +166,7 @@ public class MainActivity extends ActionBarActivity implements DentistFragment.C
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        outState.putBoolean(INFO_CREATED, infoCreated);
+        // Save data into outState.
     }
 
     @Override

@@ -1,12 +1,15 @@
 package com.example.alienegg.tamperedentist;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -17,14 +20,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.alienegg.tamperedentist.data.DentistContract;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DentistDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final String LOG_TAG = DentistDetailFragment.class.getSimpleName();
     static final String DETAIL_URI = "URI";
     private Uri mUri;
+    private boolean mTwoPane = false;
 
     // Text fields to populate with data.
     private TextView dentistTitleTextView;
@@ -100,6 +108,17 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.v(LOG_TAG, "in onCreateView");
 
+        // Get arguments for loading data for detail view.
+        // If null, means that there is no data, should disable the buttons.
+        // If coming via intent (mobile phones), get it's URI to load the data for the view.
+        Bundle arguments = getArguments();
+        if (arguments != null)
+        {
+            mUri = arguments.getParcelable(DETAIL_URI);
+            changeButtonState(true, true, true);
+            mTwoPane = arguments.getBoolean(MainActivity.TABLET_PANE);
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         dentistTitle = getResources().getString(R.string.detailDentistNameTXTview);
@@ -122,12 +141,32 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
                 Uri mapsLocation = Uri.parse("geo:" + latitude + "," + longitude + "?q="
                         + streetAddress + " " + zipCode + " " + postalCity);
                 Intent mapsI = new Intent(Intent.ACTION_VIEW, mapsLocation);
-                try{
-                    startActivity(mapsI);
-                } catch(Exception e){
-                    Log.v(LOG_TAG, "in onClick Maps Button; No Maps application?");
-                    e.printStackTrace();
+
+                // Check for all applications that can handle this data.
+                // And exclude TampereDentist from the selection.
+                PackageManager pm = getActivity().getPackageManager();
+                List<ResolveInfo> activities = pm.queryIntentActivities(mapsI, 0);
+
+                List<Intent> targetMapIntents = new ArrayList<Intent>();
+                for (ResolveInfo currentInfo : activities)
+                {
+                    String packageName = currentInfo.activityInfo.packageName;
+                    if (!packageName.equals(MainActivity.PACKAGE_NAME))
+                    {
+                        Intent targetMapIntent = new Intent(Intent.ACTION_VIEW, mapsLocation);
+                        targetMapIntent.setPackage(packageName);
+                        targetMapIntents.add(targetMapIntent);
+                    }
                 }
+
+                if (targetMapIntents.size() > 0){
+                    Intent chooserIntent = Intent.createChooser(targetMapIntents.remove(0), "Open file with");
+                    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetMapIntents.toArray(new Parcelable[]{}));
+                    startActivity(chooserIntent);
+                }
+                else
+                    Toast.makeText(getActivity(), R.string.ERROR_MAPS, Toast.LENGTH_LONG).show();
+
             }
         });
 
@@ -138,12 +177,12 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
                 Log.v(LOG_TAG, "in onClick Phone Button");
                 Intent call = new Intent(Intent.ACTION_DIAL);
                 call.setData(Uri.parse("tel:" + phoneNumber));
-                try{
+
+                // Check that it is proper intent.
+                if  (call.resolveActivityInfo(getActivity().getPackageManager(), call.getFlags()).exported)
                     startActivity(call);
-                }catch(Exception e){
-                    Log.v(LOG_TAG, "in onClick Phone Button; No Dialer?");
-                    e.printStackTrace();
-                }
+                else
+                    Toast.makeText(getActivity(), R.string.ERROR_PHONE, Toast.LENGTH_LONG).show();
             }
         });
 
@@ -154,25 +193,17 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
                 Log.v(LOG_TAG, "in onClick Browser Button");
                 Intent browser = new Intent(Intent.ACTION_VIEW);
                 browser.setData(Uri.parse(URLlink));
-                try{
+
+                // Check that it is proper intent.
+                if  (browser.resolveActivityInfo(getActivity().getPackageManager(), browser.getFlags()).exported)
                     startActivity(browser);
-                } catch(Exception e){
-                    Log.v(LOG_TAG, "in onClick Browser Button; No Browser?");
-                    e.printStackTrace();
-                }
+                else
+                    Toast.makeText(getActivity(), R.string.ERROR_BROWSER, Toast.LENGTH_LONG).show();
             }
         });
 
 
-        // Get arguments for loading data for detail view.
-        // If null, means that there is no data, should disable the buttons.
-        // If coming via intent (mobilephones), get it's URI to load the data for the view.
-        Bundle arguments = getArguments();
-        if (arguments != null)
-        {
-            mUri = arguments.getParcelable(DETAIL_URI);
-            changeButtonState(true, true, true);
-        }
+
 
         // Populate fields via savedInstanceState and check buttons enable state.
         if (savedInstanceState != null)
@@ -206,8 +237,10 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
         }
         else
         {
+            // No data was found to populate the fields with, so disable the buttons.
             changeButtonState(false, false, false);
         }
+
 
         return rootView;
     }
@@ -219,19 +252,36 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
      */
     private void changeButtonState(boolean bool_Maps, boolean bool_Phone, boolean bool_Browser)
     {
+        // First create temporary drawables which will
+        Drawable orig_maps;
+        Drawable orig_browser;
+        Drawable orig_phone;
+
+        if (mTwoPane)
+        {
+            orig_maps = getResources().getDrawable(R.drawable.big_launch_maps);
+            orig_browser = getResources().getDrawable(R.drawable.big_launch_browser);
+            orig_phone  = getResources().getDrawable(R.drawable.big_launch_phone);
+        }
+
+        else
+        {
+            orig_maps = getResources().getDrawable(R.mipmap.ic_launch_maps);
+            orig_browser = getResources().getDrawable(R.mipmap.ic_launch_browser);
+            orig_phone  = getResources().getDrawable(R.mipmap.ic_launch_phone);
+        }
+
 
         if (Maps != null){
             Maps.setEnabled(bool_Maps);
-            Drawable orig_maps = getResources().getDrawable(R.drawable.big_launch_maps);
             if (bool_Maps)
                 Maps.setImageDrawable(orig_maps);
             else
-               Maps.setImageDrawable(convertIconToGrayScale(orig_maps));
+                Maps.setImageDrawable(convertIconToGrayScale(orig_maps));
         }
 
         if (Browser != null){
             Browser.setEnabled(bool_Browser);
-            Drawable orig_browser = getResources().getDrawable(R.drawable.big_launch_browser);
             if (bool_Maps)
                 Browser.setImageDrawable(orig_browser);
             else
@@ -240,7 +290,6 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
 
         if (Phone != null){
             Phone.setEnabled(bool_Phone);
-            Drawable orig_phone = getResources().getDrawable(R.drawable.big_launch_phone);
             if (bool_Maps)
                 Phone.setImageDrawable(orig_phone);
             else
@@ -313,6 +362,7 @@ public class DentistDetailFragment extends Fragment implements LoaderManager.Loa
 
         // Populate fields and variables with the data in the cursor.
         if (!data.moveToFirst()){return;}
+        if (data != null)
             // Bind data to variables.
             phoneNumber = data.getString(COL_phone);
             URLlink = data.getString(COL_urlLink);

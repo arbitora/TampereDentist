@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "com.example.alienegg.tamperedentist"
-        minSdkVersion 11
+        minSdkVersion 13
         targetSdkVersion 21
         versionCode 1
-        versionName "0.93"
+        versionName "0.97"
     }
     buildTypes {
         release {

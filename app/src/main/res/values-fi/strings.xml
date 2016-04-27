@@ -18,5 +18,11 @@
     <string name="OK">OK</string>
     <string name="popup_version_text">Versio numero:</string>
     <string name="popup_installDate_text">Asennus päivämäärä:</string>
+
+
+    <string name="ERROR_MAPS">Karttaa ei voitu avata.</string>
+    <string name="ERROR_BROWSER">Selainta ei voitu avata.</string>
+    <string name="ERROR_PHONE">Puhelinta ei voitu avata.</string>
+
 </resources>
 

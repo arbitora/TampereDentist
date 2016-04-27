@@ -17,7 +17,10 @@
     <string name="BTNretry">Search again</string>
     <string name="OK">OK</string>
     <string name="popup_version_text">Version number:</string>
-    <string name="popup_installDate_text">Insallation date:</string>
+    <string name="popup_installDate_text">Installation date:</string>
 
+    <string name="ERROR_MAPS">Could not open Maps.</string>
+    <string name="ERROR_BROWSER">Could not open Browser.</string>
+    <string name="ERROR_PHONE">Could not open Dialer.</string>
 </resources>
 
